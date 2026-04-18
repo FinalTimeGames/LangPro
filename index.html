@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangPro by Finaltime Studio</title>
+    <title>LangPro - PC & Mobile</title>
     <style>
         :root {
             --bg-dark: #0f0f13; --surface: #1c1c24; --surface-hover: #2a2a35;
@@ -14,23 +14,30 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { 
+            background-color: var(--bg-dark); color: var(--text-main); 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+        }
 
-        /* App Header */
+        /* --- Layout Base (Mobile First) --- */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--surface); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .studio-name { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .logo-container { display: flex; flex-direction: column; }
+        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(90deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .studio-name { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
 
-        /* Main Content Area */
-        main { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
-        .view { display: none; animation: fadeIn 0.3s ease; }
-        .view.active { display: block; }
+        .app-wrapper { display: flex; flex: 1; flex-direction: column; overflow: hidden; }
+
+        main { flex: 1; overflow-y: auto; padding: 20px; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .view-content { width: 100%; max-width: 500px; } /* Centraliza o conteúdo no PC */
+        
+        .view { display: none; animation: fadeIn 0.3s ease; width: 100%; }
+        .view.active { display: flex; justify-content: center; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bottom Navigation */
-        nav { display: flex; background: var(--surface); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.05); }
-        .nav-item { flex: 1; padding: 15px 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        nav { display: flex; background: var(--surface); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.05); z-index: 10; }
+        .nav-item { flex: 1; padding: 15px 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 1.2rem; }
 
         /* UI Elements */
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; transition: transform 0.1s; background: var(--surface-hover); color: var(--text-main); margin-bottom: 10px; }
@@ -38,166 +45,230 @@
         .btn-primary { background: var(--primary); box-shadow: 0 4px 15px var(--primary-glow); }
         .btn-danger { background: var(--danger); color: white; }
 
-        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; margin-bottom: 15px; font-size: 1rem; }
-        label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; display: block; }
+        input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-bottom: 18px; font-size: 1rem; transition: border 0.3s; }
+        input:focus { outline: none; border-color: var(--primary); }
+        label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; }
 
-        /* Card System */
-        .card-container { perspective: 1500px; width: 100%; height: 350px; margin-bottom: 20px; }
+        /* Card System (Responsivo) */
+        .card-container { perspective: 1500px; width: 100%; height: 380px; margin-bottom: 20px; }
         .card { width: 100%; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; position: relative; }
         .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--surface); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .card-back { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--surface); border-radius: 24px; padding: 24px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .card-back { transform: rotateY(180deg); background: linear-gradient(145deg, #1f1f2e, #1c1c24); }
         
-        .card-img { max-width: 100%; max-height: 120px; border-radius: 10px; margin-bottom: 15px; object-fit: cover; display: none; }
-        .word-main { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
-        .word-sub { font-size: 1.2rem; color: var(--primary); margin: 5px 0; }
+        .card-img { max-width: 100%; max-height: 140px; border-radius: 12px; margin-bottom: 20px; object-fit: cover; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .word-main { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+        .word-sub { font-size: 1.4rem; color: var(--primary); margin: 5px 0; font-weight: 700; }
         
-        /* Study Controls */
-        .study-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .study-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .study-controls.visible { opacity: 1; pointer-events: auto; }
-        .btn-sm2 { padding: 10px 5px; border-radius: 10px; border: none; font-weight: bold; font-size: 0.85rem; color: white; display: flex; flex-direction: column; align-items: center; }
-        .btn-sm2 span { font-size: 0.65rem; opacity: 0.8; margin-top: 3px; font-weight: normal; }
+        .btn-sm2 { padding: 12px 5px; border-radius: 12px; border: none; font-weight: bold; font-size: 0.9rem; color: white; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.2s; }
+        .btn-sm2:hover { filter: brightness(1.1); }
+        .btn-sm2 span { font-size: 0.7rem; opacity: 0.8; margin-top: 4px; font-weight: normal; }
 
-        /* File Input Wrapper */
-        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; text-align: center; }
         .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
+
+        /* --- Desktop Responsive PC (Sidebar Layout) --- */
+        @media (min-width: 768px) {
+            body { flex-direction: row; }
+            header { display: none; } /* Oculta header mobile */
+            
+            .app-wrapper { flex-direction: row; width: 100%; }
+            
+            nav { 
+                flex-direction: column; width: 280px; justify-content: flex-start; 
+                padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.05); border-top: none; 
+                background: #14141a;
+            }
+            
+            /* Logo na Sidebar para PC */
+            nav::before {
+                content: 'LangPro';
+                font-size: 1.8rem; font-weight: 900;
+                background: linear-gradient(90deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                margin-bottom: 5px; text-align: left; padding-left: 15px;
+            }
+            nav::after {
+                content: 'FINALTIME STUDIO';
+                font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px; font-weight: bold;
+                margin-bottom: 40px; text-align: left; padding-left: 15px; display: block;
+            }
+
+            .nav-item { 
+                flex: none; padding: 15px 20px; text-align: left; flex-direction: row; 
+                justify-content: flex-start; border-radius: 12px; margin-bottom: 10px;
+                font-size: 1rem;
+            }
+            .nav-item:hover { background: rgba(255,255,255,0.03); }
+            .nav-item.active { background: rgba(79, 70, 229, 0.15); border-left: 4px solid var(--primary); }
+
+            main { padding: 40px; align-items: center; justify-content: center; }
+            .card-container { height: 450px; }
+            .word-main { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div>
+    <header id="mobile-header">
+        <div class="logo-container">
             <div class="logo">LangPro</div>
             <span class="studio-name">Finaltime Studio</span>
         </div>
-        <select id="lang-selector" style="width: auto; padding: 5px; margin: 0; font-size: 0.8rem;" onchange="changeAppLanguage(this.value)">
+        <select id="lang-selector" style="width: auto; padding: 6px 10px; margin: 0; font-size: 0.8rem; border-radius: 6px;" onchange="changeAppLanguage(this.value)">
             <option value="pt">PT</option>
             <option value="en">EN</option>
             <option value="fr">FR</option>
         </select>
     </header>
 
-    <main>
-        <div id="view-study" class="view active">
-            <h2 id="ui-study-title" style="margin-bottom: 20px; font-size: 1.2rem;">Sessão de Hoje</h2>
-            <div id="no-cards-msg" style="display: none; text-align: center; color: var(--text-muted); margin-top: 50px;">
-                <p id="ui-done-msg">Você revisou tudo por hoje!</p>
-                <button class="btn btn-primary" style="margin-top: 20px;" onclick="switchView('decks')" id="ui-btn-manage">Gerenciar Decks</button>
+    <div class="app-wrapper">
+        <nav>
+            <div class="nav-item active" onclick="switchView('study', this)" id="nav-study">
+                <span class="nav-icon">🧠</span> <span id="txt-nav-study">Estudar</span>
             </div>
-            
-            <div id="study-area">
-                <div class="card-container" onclick="flipCard()">
-                    <div class="card" id="flashcard">
-                        <div class="card-face card-front">
-                            <img id="front-img" class="card-img" src="" alt="Card Image">
-                            <div class="word-main" id="front-word">...</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);" id="ui-tap-reveal">Toque para revelar</div>
+            <div class="nav-item" onclick="switchView('decks', this)" id="nav-decks">
+                <span class="nav-icon">➕</span> <span id="txt-nav-decks">Adicionar Cartas</span>
+            </div>
+            <div class="nav-item" onclick="switchView('settings', this)" id="nav-settings">
+                <span class="nav-icon">⚙️</span> <span id="txt-nav-settings">Banco de Dados</span>
+            </div>
+        </nav>
+
+        <main>
+            <div id="view-study" class="view active">
+                <div class="view-content">
+                    <h2 id="ui-study-title" style="margin-bottom: 25px; font-size: 1.5rem;">Sessão de Hoje</h2>
+                    
+                    <div id="no-cards-msg" style="display: none; text-align: center; color: var(--text-muted); margin-top: 50px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🏆</div>
+                        <p id="ui-done-msg" style="font-size: 1.2rem; margin-bottom: 30px;">Sincronização neural completa por hoje!</p>
+                        <button class="btn btn-primary" onclick="switchView('decks')" id="ui-btn-manage">Adicionar Novo Vocabulário</button>
+                    </div>
+                    
+                    <div id="study-area">
+                        <div class="card-container" onclick="flipCard()">
+                            <div class="card" id="flashcard">
+                                <div class="card-face card-front">
+                                    <img id="front-img" class="card-img" src="" alt="Card Image">
+                                    <div class="word-main" id="front-word">...</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 20px;" id="ui-tap-reveal">Toque para revelar</div>
+                                </div>
+                                <div class="card-face card-back">
+                                    <div class="word-sub" id="back-target1">...</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">Tradução 1</div>
+                                    
+                                    <div style="width: 50px; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 20px;"></div>
+                                    
+                                    <div class="word-sub" style="color: #c084fc;" id="back-target2">...</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Tradução 2</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-face card-back">
-                            <div class="word-sub" id="back-target1">...</div>
-                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 15px;">Target 1</div>
-                            <div class="word-sub" style="color: #c084fc;" id="back-target2">...</div>
-                            <div style="font-size: 0.7rem; color: var(--text-muted);">Target 2</div>
+
+                        <div class="study-controls" id="controls">
+                            <button class="btn-sm2" style="background: var(--danger);" onclick="processAnswer(0)">
+                                <b id="ui-btn-again">Errei</b><span id="time-again">&lt;1m</span>
+                            </button>
+                            <button class="btn-sm2" style="background: var(--warning);" onclick="processAnswer(1)">
+                                <b id="ui-btn-hard">Difícil</b><span id="time-hard">...</span>
+                            </button>
+                            <button class="btn-sm2" style="background: var(--success);" onclick="processAnswer(2)">
+                                <b id="ui-btn-good">Bom</b><span id="time-good">...</span>
+                            </button>
+                            <button class="btn-sm2" style="background: var(--primary);" onclick="processAnswer(3)">
+                                <b id="ui-btn-easy">Fácil</b><span id="time-easy">...</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="study-controls" id="controls">
-                    <button class="btn-sm2" style="background: var(--danger);" onclick="processAnswer(0)">
-                        <b id="ui-btn-again">Errei</b><span id="time-again">&lt;1m</span>
-                    </button>
-                    <button class="btn-sm2" style="background: var(--warning);" onclick="processAnswer(1)">
-                        <b id="ui-btn-hard">Difícil</b><span id="time-hard">...</span>
-                    </button>
-                    <button class="btn-sm2" style="background: var(--success);" onclick="processAnswer(2)">
-                        <b id="ui-btn-good">Bom</b><span id="time-good">...</span>
-                    </button>
-                    <button class="btn-sm2" style="background: var(--primary);" onclick="processAnswer(3)">
-                        <b id="ui-btn-easy">Fácil</b><span id="time-easy">...</span>
-                    </button>
+            <div id="view-decks" class="view">
+                <div class="view-content">
+                    <h2 id="ui-decks-title" style="margin-bottom: 25px; font-size: 1.5rem;">Forjar Nova Carta</h2>
+                    
+                    <label id="ui-label-front">Frente (Sua língua base)</label>
+                    <input type="text" id="input-front" placeholder="Ex: Seringa / Administrar">
+                    
+                    <label id="ui-label-t1">Verso 1 (Ex: Inglês)</label>
+                    <input type="text" id="input-t1" placeholder="Ex: Syringe / To administer">
+                    
+                    <label id="ui-label-t2">Verso 2 (Ex: Francês)</label>
+                    <input type="text" id="input-t2" placeholder="Ex: Seringue / Administrer">
+                    
+                    <label id="ui-label-img">Memória Visual (Imagem Opcional)</label>
+                    <div class="file-upload-wrapper btn" style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2);">
+                        <span id="ui-btn-upload">📁 Escolher Imagem do PC/Celular</span>
+                        <input type="file" id="input-img" accept="image/*" onchange="handleImageUpload(event)">
+                    </div>
+                    <img id="img-preview" src="" style="max-width: 100%; max-height: 150px; display: none; margin: 0 auto 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+
+                    <button class="btn btn-primary" onclick="addCard()" id="ui-btn-add" style="margin-top: 10px;">Salvar Carta no Banco</button>
                 </div>
             </div>
-        </div>
 
-        <div id="view-decks" class="view">
-            <h2 id="ui-decks-title" style="margin-bottom: 20px; font-size: 1.2rem;">Adicionar Nova Carta</h2>
-            
-            <label id="ui-label-front">Frente (Sua língua)</label>
-            <input type="text" id="input-front" placeholder="Ex: Seringa">
-            
-            <label id="ui-label-t1">Verso 1 (Ex: Inglês)</label>
-            <input type="text" id="input-t1" placeholder="Ex: Syringe">
-            
-            <label id="ui-label-t2">Verso 2 (Ex: Francês)</label>
-            <input type="text" id="input-t2" placeholder="Ex: Seringue">
-            
-            <label id="ui-label-img">Imagem (Opcional)</label>
-            <div class="file-upload-wrapper btn">
-                <span id="ui-btn-upload">Escolher Imagem</span>
-                <input type="file" id="input-img" accept="image/*" onchange="handleImageUpload(event)">
+            <div id="view-settings" class="view">
+                <div class="view-content">
+                    <h2 id="ui-settings-title" style="margin-bottom: 25px; font-size: 1.5rem;">Gestão de Dados</h2>
+                    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+                        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;" id="ui-settings-desc">
+                            O LangPro Desktop e Mobile opera 100% offline. Suas cartas, imagens e progresso neurológico ficam salvos na memória local. Exporte o arquivo .json para fazer backup.
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="exportData()" id="ui-btn-export">⬇️ Exportar Backup (.json)</button>
+                    
+                    <div class="file-upload-wrapper btn" style="background: var(--surface-hover);">
+                        <span id="ui-btn-import">⬆️ Importar Backup (.json)</span>
+                        <input type="file" accept=".json" onchange="importData(event)">
+                    </div>
+
+                    <div style="margin-top: 50px; border-top: 1px solid rgba(255,0,0,0.2); padding-top: 30px;">
+                        <button class="btn btn-danger" onclick="factoryReset()" id="ui-btn-reset">⚠️ Resetar Todo o Progresso</button>
+                    </div>
+                </div>
             </div>
-            <img id="img-preview" src="" style="max-width: 100px; max-height: 100px; display: none; margin: 0 auto 15px; border-radius: 8px;">
-
-            <button class="btn btn-primary" onclick="addCard()" id="ui-btn-add">Salvar Carta</button>
-        </div>
-
-        <div id="view-settings" class="view">
-            <h2 id="ui-settings-title" style="margin-bottom: 20px; font-size: 1.2rem;">Banco de Dados</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;" id="ui-settings-desc">O LangPro opera 100% offline. Exporte seus dados para não perdê-los e importe em qualquer dispositivo.</p>
-            
-            <button class="btn btn-primary" onclick="exportData()" id="ui-btn-export">Exportar Backup (.json)</button>
-            
-            <div class="file-upload-wrapper btn" style="background: var(--surface-hover);">
-                <span id="ui-btn-import">Importar Backup (.json)</span>
-                <input type="file" accept=".json" onchange="importData(event)">
-            </div>
-
-            <button class="btn btn-danger" style="margin-top: 30px;" onclick="factoryReset()" id="ui-btn-reset">Resetar Aplicativo</button>
-        </div>
-    </main>
-
-    <nav>
-        <div class="nav-item active" onclick="switchView('study', this)" id="nav-study">Estudar</div>
-        <div class="nav-item" onclick="switchView('decks', this)" id="nav-decks">Cartas</div>
-        <div class="nav-item" onclick="switchView('settings', this)" id="nav-settings">Ajustes</div>
-    </nav>
+        </main>
+    </div>
 
     <script>
-        // --- i18n (Internacionalização) ---
-        const dictionary = {
+        // --- i18n ---
+        const dic = {
             pt: {
-                study: "Sessão de Hoje", done: "Você revisou tudo por hoje!", manage: "Gerenciar Decks",
+                study: "Sessão de Hoje", done: "Sincronização neural completa por hoje!", manage: "Adicionar Novo Vocabulário",
                 tap: "Toque para revelar", again: "Errei", hard: "Difícil", good: "Bom", easy: "Fácil",
-                decksTitle: "Adicionar Nova Carta", lFront: "Frente (Sua língua)", lT1: "Verso 1 (Ex: Inglês)",
-                lT2: "Verso 2 (Ex: Francês)", lImg: "Imagem (Opcional)", btnUpload: "Escolher Imagem", btnAdd: "Salvar Carta",
-                settingsTitle: "Banco de Dados", settingsDesc: "O LangPro opera 100% offline. Exporte seus dados para não perdê-los e importe em qualquer dispositivo.",
-                btnExport: "Exportar Backup (.json)", btnImport: "Importar Backup (.json)", btnReset: "Resetar Aplicativo",
-                navStudy: "Estudar", navDecks: "Cartas", navSettings: "Ajustes", alertAdd: "Carta adicionada com sucesso!", alertReset: "Tem certeza? Isso apagará tudo."
+                decksTitle: "Forjar Nova Carta", lFront: "Frente (Sua língua base)", lT1: "Verso 1 (Ex: Inglês)",
+                lT2: "Verso 2 (Ex: Francês)", lImg: "Memória Visual (Imagem Opcional)", btnUpload: "📁 Escolher Imagem do PC/Celular", btnAdd: "Salvar Carta no Banco",
+                settingsTitle: "Gestão de Dados", settingsDesc: "O LangPro Desktop e Mobile opera 100% offline. Suas cartas, imagens e progresso neurológico ficam salvos na memória local. Exporte o arquivo .json para fazer backup.",
+                btnExport: "⬇️ Exportar Backup (.json)", btnImport: "⬆️ Importar Backup (.json)", btnReset: "⚠️ Resetar Todo o Progresso",
+                navStudy: "Estudar", navDecks: "Adicionar Cartas", navSettings: "Banco de Dados"
             },
             en: {
-                study: "Today's Session", done: "You are all caught up for today!", manage: "Manage Decks",
+                study: "Today's Session", done: "Neural sync complete for today!", manage: "Add New Vocabulary",
                 tap: "Tap to reveal", again: "Again", hard: "Hard", good: "Good", easy: "Easy",
-                decksTitle: "Add New Card", lFront: "Front (Native)", lT1: "Back 1 (e.g. English)",
-                lT2: "Back 2 (e.g. French)", lImg: "Image (Optional)", btnUpload: "Choose Image", btnAdd: "Save Card",
-                settingsTitle: "Database", settingsDesc: "LangPro works 100% offline. Export your data to keep it safe and import it on any device.",
-                btnExport: "Export Backup (.json)", btnImport: "Import Backup (.json)", btnReset: "Factory Reset",
-                navStudy: "Study", navDecks: "Cards", navSettings: "Settings", alertAdd: "Card added successfully!", alertReset: "Are you sure? This will delete everything."
+                decksTitle: "Forge New Card", lFront: "Front (Base language)", lT1: "Back 1 (e.g., English)",
+                lT2: "Back 2 (e.g., French)", lImg: "Visual Memory (Image Optional)", btnUpload: "📁 Choose Image from PC/Mobile", btnAdd: "Save Card to Database",
+                settingsTitle: "Data Management", settingsDesc: "LangPro Desktop and Mobile runs 100% offline. Your cards, images, and neural progress are saved in local memory. Export the .json file to backup.",
+                btnExport: "⬇️ Export Backup (.json)", btnImport: "⬆️ Import Backup (.json)", btnReset: "⚠️ Reset All Progress",
+                navStudy: "Study", navDecks: "Add Cards", navSettings: "Database"
             },
             fr: {
-                study: "Session du Jour", done: "Vous avez tout révisé pour aujourd'hui !", manage: "Gérer les Decks",
+                study: "Session du Jour", done: "Synchronisation neurale terminée pour aujourd'hui !", manage: "Ajouter du Vocabulaire",
                 tap: "Touchez pour révéler", again: "Encore", hard: "Difficile", good: "Bon", easy: "Facile",
-                decksTitle: "Ajouter une Carte", lFront: "Recto (Langue maternelle)", lT1: "Verso 1 (ex: Anglais)",
-                lT2: "Verso 2 (ex: Français)", lImg: "Image (Optionnel)", btnUpload: "Choisir une Image", btnAdd: "Sauvegarder",
-                settingsTitle: "Base de Données", settingsDesc: "LangPro fonctionne 100% hors ligne. Exportez vos données pour les sécuriser.",
-                btnExport: "Exporter Backup (.json)", btnImport: "Importer Backup (.json)", btnReset: "Réinitialiser l'App",
-                navStudy: "Étudier", navDecks: "Cartes", navSettings: "Paramètres", alertAdd: "Carte ajoutée avec succès !", alertReset: "Êtes-vous sûr ? Cela va tout effacer."
+                decksTitle: "Forger une Nouvelle Carte", lFront: "Recto (Langue de base)", lT1: "Verso 1 (ex: Anglais)",
+                lT2: "Verso 2 (ex: Français)", lImg: "Mémoire Visuelle (Image Optionnelle)", btnUpload: "📁 Choisir une image PC/Mobile", btnAdd: "Sauvegarder la Carte",
+                settingsTitle: "Gestion des Données", settingsDesc: "LangPro Desktop et Mobile fonctionne 100% hors ligne. Vos cartes, images et progrès neuronal sont sauvegardés localement. Exportez le fichier .json pour sauvegarder.",
+                btnExport: "⬇️ Exporter Backup (.json)", btnImport: "⬆️ Importer Backup (.json)", btnReset: "⚠️ Réinitialiser le Progrès",
+                navStudy: "Étudier", navDecks: "Ajouter des Cartes", navSettings: "Base de Données"
             }
         };
 
         let currentLang = 'pt';
         function changeAppLanguage(lang) {
             currentLang = lang;
-            const d = dictionary[lang];
+            const d = dic[lang];
             document.getElementById('ui-study-title').innerText = d.study;
             document.getElementById('ui-done-msg').innerText = d.done;
             document.getElementById('ui-btn-manage').innerText = d.manage;
@@ -211,31 +282,30 @@
             document.getElementById('ui-label-t1').innerText = d.lT1;
             document.getElementById('ui-label-t2').innerText = d.lT2;
             document.getElementById('ui-label-img').innerText = d.lImg;
-            document.getElementById('ui-btn-upload').innerText = d.btnUpload;
+            if(!tempBase64Image) document.getElementById('ui-btn-upload').innerText = d.btnUpload;
             document.getElementById('ui-btn-add').innerText = d.btnAdd;
             document.getElementById('ui-settings-title').innerText = d.settingsTitle;
             document.getElementById('ui-settings-desc').innerText = d.settingsDesc;
             document.getElementById('ui-btn-export').innerText = d.btnExport;
             document.getElementById('ui-btn-import').innerText = d.btnImport;
             document.getElementById('ui-btn-reset').innerText = d.btnReset;
-            document.getElementById('nav-study').innerText = d.navStudy;
-            document.getElementById('nav-decks').innerText = d.navDecks;
-            document.getElementById('nav-settings').innerText = d.navSettings;
+            document.getElementById('txt-nav-study').innerText = d.navStudy;
+            document.getElementById('txt-nav-decks').innerText = d.navDecks;
+            document.getElementById('txt-nav-settings').innerText = d.navSettings;
         }
 
-        // --- Core App Logic (Banco de Dados e SM-2) ---
+        // --- Core App Logic ---
         const defaultDB = [
             { id: Date.now(), front: "Pronto-socorro", t1: "Emergency Room", t2: "Salle des urgences", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 },
-            { id: Date.now()+1, front: "Entrevista de emprego", t1: "Job interview", t2: "Entretien d'embauche", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 }
+            { id: Date.now()+1, front: "Pressão arterial", t1: "Blood pressure", t2: "Tension artérielle", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 }
         ];
 
-        let db = JSON.parse(localStorage.getItem('langProDB')) || defaultDB;
+        let db = JSON.parse(localStorage.getItem('langProDB_2')) || defaultDB;
         let queue = [];
         let currentCard = null;
         let isFlipped = false;
         let tempBase64Image = "";
 
-        // Navegação SPA
         function switchView(viewId, navElement = null) {
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${viewId}`).classList.add('active');
@@ -251,19 +321,17 @@
             if(viewId === 'study') initStudySession();
         }
 
-        // --- Imagens (Base64) ---
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    tempBase64Image = e.target.result; // String Base64
+                    tempBase64Image = e.target.result;
                     const preview = document.getElementById('img-preview');
                     preview.src = tempBase64Image;
                     preview.style.display = 'block';
-                    document.getElementById('ui-btn-upload').innerText = "Imagem Carregada!";
+                    document.getElementById('ui-btn-upload').innerText = "✅ Imagem Carregada!";
                 };
-                // Reduzir tamanho se possível em produção, aqui salva direto
                 reader.readAsDataURL(file);
             }
         }
@@ -275,26 +343,21 @@
 
             if(!front || (!t1 && !t2)) return alert("Preencha a frente e pelo menos um verso.");
 
-            const newCard = {
+            db.push({
                 id: Date.now(), front, t1, t2, img: tempBase64Image,
                 interval: 0, reps: 0, ease: 2.5, nextReview: 0
-            };
-
-            db.push(newCard);
+            });
             saveDB();
             
-            // Limpar form
             document.getElementById('input-front').value = '';
             document.getElementById('input-t1').value = '';
             document.getElementById('input-t2').value = '';
             document.getElementById('img-preview').style.display = 'none';
-            document.getElementById('ui-btn-upload').innerText = dictionary[currentLang].btnUpload;
+            document.getElementById('ui-btn-upload').innerText = dic[currentLang].btnUpload;
             tempBase64Image = "";
-
-            alert(dictionary[currentLang].alertAdd);
+            alert("Carta forjada e salva no banco!");
         }
 
-        // --- Estudo e Algoritmo ---
         function initStudySession() {
             const now = Date.now();
             queue = db.filter(c => c.nextReview <= now).sort(() => Math.random() - 0.5);
@@ -321,7 +384,6 @@
             cardEl.classList.remove('flipped');
             controls.classList.remove('visible');
 
-            // Set Data
             setTimeout(() => {
                 const imgEl = document.getElementById('front-img');
                 if(currentCard.img) {
@@ -361,7 +423,7 @@
                 card.ease = Math.max(1.3, card.ease + (0.1 - (3 - quality) * (0.08 + (3 - quality) * 0.02)));
             }
 
-            if (quality !== 0) card.nextReview = Date.now() + (card.interval * 86400000); // dias para ms
+            if (quality !== 0) card.nextReview = Date.now() + (card.interval * 86400000);
             
             const index = db.findIndex(c => c.id === card.id);
             db[index] = card;
@@ -376,15 +438,14 @@
             document.getElementById('time-easy').innerText = fmt(card.reps === 0 ? 4 : card.interval * card.ease * 1.3);
         }
 
-        // --- Import / Export / Dados ---
-        function saveDB() { localStorage.setItem('langProDB', JSON.stringify(db)); }
+        function saveDB() { localStorage.setItem('langProDB_2', JSON.stringify(db)); }
 
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
             downloadAnchorNode.setAttribute("download", "langpro_backup.json");
-            document.body.appendChild(downloadAnchorNode); // required for firefox
+            document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         }
@@ -399,25 +460,22 @@
                     if(Array.isArray(importedDB)) {
                         db = importedDB;
                         saveDB();
-                        alert("Backup importado com sucesso!");
+                        alert("Backup importado e sincronizado com sucesso!");
                         initStudySession();
-                    } else { throw new Error("Formato inválido"); }
-                } catch(err) {
-                    alert("Erro ao ler o arquivo JSON. O arquivo pode estar corrompido.");
-                }
+                    } else throw new Error();
+                } catch(err) { alert("Erro ao ler o arquivo. Corrompido ou formato inválido."); }
             };
             reader.readAsText(file);
         }
 
         function factoryReset() {
-            if(confirm(dictionary[currentLang].alertReset)) {
+            if(confirm("ATENÇÃO: Tem certeza? Todo o progresso e cartas forjadas serão deletados.")) {
                 db = defaultDB;
                 saveDB();
                 location.reload();
             }
         }
 
-        // Iniciar
         initStudySession();
     </script>
 </body>
