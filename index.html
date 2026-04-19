@@ -2,992 +2,256 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LangPro 7.0 | Finaltime Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Theming Dinâmico - Padrão */
-            --bg-deep: #09090b; --surface: #18181b; --surface-hover: #27272a;
-            --primary: #8b5cf6; --primary-glow: rgba(139, 92, 246, 0.4);
-            --secondary: #ec4899; --accent: #06b6d4;
-            --text-main: #f4f4f5; --text-muted: #a1a1aa;
-            --danger: #ef4444; --success: #10b981; --warning: #f59e0b;
+            --bg-dark: #09090b;
+            --surface: rgba(24, 24, 27, 0.6);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --accent: #06b6d4;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-deep); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; letter-spacing: -0.01em; transition: background-color 0.5s ease; }
-
-        /* Headers */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 40; }
-        .logo-container { display: flex; flex-direction: column; }
-        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1.2px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .studio-name { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-top: 2px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .coin-balance { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; color: #facc15; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 10px rgba(250, 204, 21, 0.1); transition: transform 0.2s; }
-        .coin-balance.bump { transform: scale(1.1); box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
-        .lang-select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; outline: none; }
-        .lang-select option { background: var(--surface); color: white; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        .app-wrapper { display: flex; flex: 1; flex-direction: column; overflow: hidden; position: relative; }
-        main { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; position: relative; scroll-behavior: smooth; }
-        .view-content { width: 100%; max-width: 540px; padding-bottom: 100px; z-index: 2; }
+        /* Ambient Neons */
+        .bg-glow {
+            position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%);
+            filter: blur(120px); z-index: -1; opacity: 0.5; 
+            animation: pulseGlow 10s ease-in-out infinite alternate;
+            will-change: transform, opacity;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 60%);
+            filter: blur(120px); z-index: -1; opacity: 0.4; 
+            animation: pulseGlow 12s ease-in-out infinite alternate-reverse;
+            will-change: transform, opacity;
+        }
+
+        @keyframes pulseGlow { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(1.15); opacity: 0.7; } }
+
+        /* Navigation */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 8%; position: fixed; width: 100%; top: 0;
+            background: rgba(9, 9, 11, 0.5); backdrop-filter: blur(16px); z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        nav.scrolled { padding: 15px 8%; background: rgba(9, 9, 11, 0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; font-weight: 900; color: rgba(255,255,255,0.02); white-space: nowrap; pointer-events: none; z-index: 0; user-select: none; letter-spacing: -1px; }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: baseline;}
+        .logo span.highlight { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-studio { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); font-weight: 800; margin-left: 12px; }
 
-        .view { display: none; animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; }
-        .view.active { display: flex; justify-content: center; }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Onboarding Modal */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-content { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); padding: 32px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .modal-icon { font-size: 3rem; margin-bottom: 16px; }
-        .modal-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 12px; }
-        .modal-desc { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
-        .modal-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; }
-        .dot.active { background: var(--primary); transform: scale(1.2); }
-
-        /* Gamification HUD & Daily Goal */
-        .hud { display: flex; justify-content: space-between; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; backdrop-filter: blur(8px); box-shadow: 0 4px 20px rgba(0,0,0,0.15); transition: transform 0.1s; }
-        .hud.pulse { transform: scale(1.03); border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
-        .hud-stat { text-align: center; flex: 1; position: relative; }
-        .hud-stat:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: rgba(255,255,255,0.06); }
-        .hud-val { font-size: 1.3rem; font-weight: 900; color: var(--text-main); }
-        .hud-label { font-size: 0.65rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 800; }
-        .streak-fire { color: var(--warning); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+        /* Hero Section */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 120px 5% 40px; position: relative;
+        }
+        .hero h1 { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px; }
+        .hero p { font-size: 1.25rem; color: var(--text-muted); max-width: 650px; margin-bottom: 48px; }
         
-        .daily-goal-container { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px 16px; margin-bottom: 24px; }
-        .daily-goal-header { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .goal-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden; position: relative; }
-        .goal-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 4px; }
-
-        .time-bonus { font-size: 0.85rem; color: var(--success); opacity: 0; transition: opacity 0.3s; font-weight: 900; text-align: center; margin-bottom: 15px; text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); position: absolute; width: 100%; top: -20px; }
-        .time-bonus.active { opacity: 1; transform: translateY(-10px); }
-
-        /* UI Elements */
-        .deck-selector { width: 100%; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: white; font-size: 1rem; margin-bottom: 20px; outline: none; cursor: pointer; transition: all 0.3s ease; }
-        .deck-selector:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15); }
-        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface-hover); color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), #6366f1); box-shadow: 0 4px 15px var(--primary-glow); }
-        .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 6px 20px var(--primary-glow); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; z-index: 10; }
+        .btn {
+            padding: 18px 40px; border-radius: 100px; font-weight: 800; text-decoration: none; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 12px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer; outline: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #6366f1); color: white;
+            box-shadow: 0 8px 25px var(--primary-glow); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 15px 35px var(--primary-glow); }
         
-        input { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); color: white; margin-bottom: 24px; font-size: 1rem; transition: all 0.3s ease; }
-        input:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.5); }
-        label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-secondary {
+            background: var(--surface); color: white; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px) scale(1.03); border-color: rgba(255,255,255,0.2); }
 
-        /* File Upload */
-        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; text-align: center; border: 1px dashed rgba(255,255,255,0.2); background: rgba(255,255,255,0.02); transition: all 0.2s; }
-        .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
+        /* Mockup 3D Flutuante */
+        .mockup-container { margin-top: 80px; perspective: 1200px; width: 100%; display: flex; justify-content: center; }
+        .mockup-card {
+            width: 100%; max-width: 850px; height: 450px; background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center;
+            transform: rotateX(8deg); transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: floatMockup 6s ease-in-out infinite;
+            position: relative; overflow: hidden;
+        }
+        .mockup-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;
+        }
+        .mockup-card:hover { transform: rotateX(0deg) translateY(-10px); animation-play-state: paused; }
+        .mockup-inner { text-align: center; color: rgba(255,255,255,0.15); font-size: 2.5rem; font-weight: 900; letter-spacing: 8px; }
 
-        /* Nav Bottom */
-        nav { display: flex; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.06); position: absolute; bottom: 0; width: 100%; z-index: 50; }
-        .nav-item { flex: 1; padding: 14px 0; text-align: center; color: #71717a; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .nav-item.active { color: var(--text-main); }
-        .nav-item.active .nav-icon { color: var(--primary); transform: translateY(-3px); filter: drop-shadow(0 2px 8px var(--primary-glow)); }
-        .nav-icon { font-size: 1.4rem; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes floatMockup { 0% { transform: rotateX(8deg) translateY(0px); } 50% { transform: rotateX(8deg) translateY(-20px); } 100% { transform: rotateX(8deg) translateY(0px); } }
 
-        /* Neural Card System */
-        .card-container { perspective: 2000px; width: 100%; height: 400px; margin-bottom: 20px; position: relative; }
-        .card { width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; position: relative; }
-        .card.flipped { transform: rotateX(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--surface); border-radius: 28px; padding: 32px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
-        .card-back { transform: rotateX(180deg); background: linear-gradient(180deg, var(--surface), var(--bg-deep)); border-color: rgba(139, 92, 246, 0.15); }
+        /* Features Section */
+        .features { padding: 120px 8%; max-width: 1200px; margin: 0 auto; }
+        .section-title { font-size: 2.8rem; font-weight: 900; margin-bottom: 70px; text-align: center; letter-spacing: -1px;}
         
-        .card-img { max-width: 100%; height: 140px; border-radius: 16px; margin-bottom: 24px; object-fit: cover; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); }
-        .word-main { font-size: 2.2rem; font-weight: 900; margin-bottom: 12px; letter-spacing: -1px; line-height: 1.1; }
-        .word-sub { font-size: 1.8rem; color: var(--text-main); margin: 8px 0; font-weight: 800; line-height: 1.2; background: linear-gradient(135deg, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
+        .card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 48px 40px;
+            border-radius: 24px; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
+        }
+        .card:hover { background: rgba(255,255,255,0.04); border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .icon { font-size: 2.8rem; margin-bottom: 24px; display: inline-flex; justify-content: center; align-items: center; width: 70px; height: 70px; background: rgba(139, 92, 246, 0.1); border-radius: 20px; color: var(--primary); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .card h3 { font-size: 1.6rem; margin-bottom: 16px; font-weight: 800; letter-spacing: -0.5px;}
+        .card p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; }
+
+        /* B2B / Creator Section */
+        .creator-section {
+            margin: 60px 8% 120px; padding: 100px 6%; background: linear-gradient(145deg, rgba(139,92,246,0.05), rgba(6,182,212,0.05));
+            border-radius: 40px; border: 1px solid rgba(255,255,255,0.05); text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .creator-section::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 300px; height: 300px;
+            background: var(--primary-glow); filter: blur(100px); opacity: 0.3; border-radius: 50%; pointer-events: none;
+        }
+        .creator-section h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 24px; letter-spacing: -1px;}
+        .creator-section p { color: var(--text-muted); max-width: 650px; margin: 0 auto 48px; font-size: 1.15rem; line-height: 1.7; }
+
+        /* Footer */
+        footer { padding: 50px 8%; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600; font-size: 0.9rem; }
+
+        /* Scroll Animations (Intersection Observer) */
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
         
-        /* Voice AI Actions */
-        .card-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
-        .btn-circle { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 50%; width: 55px; height: 55px; font-size: 1.3rem; cursor: pointer; color: white; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; position: relative; }
-        .btn-circle:active { transform: scale(0.9); }
-        .btn-audio { background: rgba(139, 92, 246, 0.1); color: var(--primary); border-color: rgba(139, 92, 246, 0.2); }
-        
-        /* WOW Feature: Voice Input */
-        .btn-mic { background: rgba(6, 182, 212, 0.1); color: var(--accent); border-color: rgba(6, 182, 212, 0.3); width: 70px; height: 70px; font-size: 1.6rem; }
-        .btn-mic.listening { animation: micPulse 1.5s infinite; background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); }
-        @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        #voice-feedback { font-size: 0.85rem; font-weight: bold; margin-top: 15px; height: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        /* Delays for grid items */
+        .grid .card:nth-child(1) { transition-delay: 0.1s; }
+        .grid .card:nth-child(2) { transition-delay: 0.2s; }
+        .grid .card:nth-child(3) { transition-delay: 0.3s; }
 
-        .btn-delete { background: rgba(239, 68, 68, 0.05); color: var(--danger); font-size: 1.2rem; border-color: transparent; }
-
-        .study-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .study-controls.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .btn-sm2 { padding: 16px 4px; border-radius: 14px; border: none; font-weight: 800; font-size: 0.95rem; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
-        .btn-sm2:active { transform: translateY(2px) scale(0.95); }
-        .btn-sm2.again { border-bottom: 4px solid var(--danger); }
-        .btn-sm2.hard { border-bottom: 4px solid var(--warning); }
-        .btn-sm2.good { border-bottom: 4px solid var(--success); }
-        .btn-sm2.easy { border-bottom: 4px solid var(--primary); }
-        .btn-sm2 span { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; font-weight: 700; opacity: 0.8; }
-
-        .module-box { background: rgba(255,255,255,0.02); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .module-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
-        .module-title span { color: var(--primary); }
-
-        /* Store / Themes */
-        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .theme-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .theme-card:hover { border-color: var(--primary); }
-        .theme-card.active { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
-        .theme-color-preview { width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 10px; display: flex; border: 2px solid rgba(255,255,255,0.2); overflow: hidden; }
-        .t-c1, .t-c2 { flex: 1; height: 100%; }
-        .theme-name { font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; }
-        .theme-price { font-size: 0.75rem; color: #facc15; font-weight: 800; }
-
-        /* Partículas / Confete */
-        #confetti-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; overflow: hidden; }
-        .confetti { position: absolute; width: 10px; height: 10px; top: -20px; animation: fall linear forwards; opacity: 0.8; }
-        @keyframes fall { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
-
-        /* Desktop Layout */
-        @media (min-width: 800px) {
-            body { flex-direction: row; }
-            #mobile-header { display: none; }
-            .app-wrapper { flex-direction: row; width: 100%; }
-            nav { position: relative; flex-direction: column; width: 260px; justify-content: flex-start; padding: 40px 20px; border-right: 1px solid rgba(255,255,255,0.05); border-top: none; background: rgba(0, 0, 0, 0.6); z-index: 10; }
-            nav::before { content: 'LangPro'; font-size: 2rem; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: left; padding-left: 15px; margin-bottom: 2px; letter-spacing: -1.5px; }
-            nav::after { content: 'FINALTIME STUDIO'; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 3px; font-weight: 800; text-align: left; padding-left: 18px; display: block; margin-bottom: 30px; }
-            
-            .nav-item { flex: none; padding: 16px 20px; text-align: left; flex-direction: row; justify-content: flex-start; border-radius: 14px; margin-bottom: 8px; font-size: 1rem; color: #a1a1aa; }
-            .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-main); }
-            .nav-item.active { background: rgba(139, 92, 246, 0.1); color: var(--primary); border: 1px solid rgba(139, 92, 246, 0.2); }
-            .nav-item.active .nav-icon { transform: translateY(0); margin-right: 16px; filter: none; }
-            .nav-icon { margin-right: 16px; font-size: 1.3rem; }
-            main { padding: 40px; align-items: center; justify-content: flex-start; overflow-y: auto; }
-            .view-content { padding-bottom: 40px; max-width: 600px; margin-top: 0; }
-            .card-container { height: 460px; }
-            .word-main { font-size: 3rem; }
-            #pc-actions-box { display: flex !important; flex-direction: column; gap: 10px; margin-bottom: 40px; padding: 0 10px;}
-            .watermark { font-size: 6rem; letter-spacing: -3px; }
+        @media (max-width: 768px) {
+            .btn-group { flex-direction: column; width: 100%; max-width: 350px; margin: 0 auto; }
+            .btn { width: 100%; justify-content: center; }
+            .hero { padding-top: 140px; }
+            .nav-studio { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="confetti-container"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
 
-    <div class="modal-overlay" id="onboarding-modal">
-        <div class="modal-content">
-            <div class="modal-icon" id="ob-icon">🚀</div>
-            <h2 class="modal-title" id="ob-title">Bem-vindo ao LangPro</h2>
-            <p class="modal-desc" id="ob-desc">A plataforma definitiva de neuro-aprendizado. Vamos configurar sua primeira sessão em 3 passos rápidos.</p>
-            
-            <div class="modal-dots">
-                <div class="dot active" id="dot-1"></div>
-                <div class="dot" id="dot-2"></div>
-                <div class="dot" id="dot-3"></div>
-            </div>
-            
-            <button class="btn btn-primary" id="ob-btn" onclick="nextOnboarding()">Começar</button>
+    <nav id="navbar">
+        <div class="logo">LangPro<span class="highlight">.</span><span class="nav-studio">Finaltime Studio</span></div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="reveal">Domine Idiomas.<br>Neuro-Aprendizado.</h1>
+        <p class="reveal">A plataforma definitiva de flashcards. Repetição espaçada SM-2, IA de avaliação fonética e Gamificação para acelerar suas conexões neurais.</p>
+        
+        <div class="btn-group reveal">
+            <button id="buy-btn-android" class="btn btn-primary">
+                <span style="font-size: 1.3rem;">📱</span> Obter para Android
+            </button>
+            <button id="buy-btn-win" class="btn btn-secondary">
+                <span style="font-size: 1.3rem;">💻</span> Obter para Windows
+            </button>
         </div>
-    </div>
 
-    <header id="mobile-header">
-        <div class="logo-container">
-            <div class="logo">LangPro</div>
-            <span class="studio-name">Finaltime Studio</span>
+        <div class="mockup-container reveal">
+            <div class="mockup-card">
+                <div class="mockup-inner">VISUAL DO LANGPRO</div>
+            </div>
         </div>
-        <div class="header-actions">
-            <div class="coin-balance" id="mob-coins">🪙 0</div>
-            <select class="lang-select" onchange="changeLang(this.value)" id="lang-sel-mob">
-                <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option><option value="fr">FR</option><option value="it">IT</option><option value="de">DE</option>
-            </select>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title reveal">Engenharia de Retenção</h2>
+        <div class="grid">
+            <div class="card reveal">
+                <div class="icon">🎤</div>
+                <h3>Voz Nativa IA</h3>
+                <p>Treine sua pronúncia com avaliação fonética em tempo real. O aplicativo escuta, processa via algoritmo de Levenshtein e corrige sua fala offline.</p>
+            </div>
+            <div class="card reveal">
+                <div class="icon">🧠</div>
+                <h3>Algoritmo SM-2</h3>
+                <p>Esqueça a revisão manual. O motor de repetição espaçada analisa sua dificuldade em cada carta e agenda a revisão para o momento exato em que você iria esquecer.</p>
+            </div>
+            <div class="card reveal">
+                <div class="icon">🪙</div>
+                <h3>Gamificação & Loja</h3>
+                <p>Estudar não precisa ser chato. Mantenha sua ofensiva de dias, ganhe moedas por respostas rápidas e desbloqueie temas visuais (Dark, Hacker, Sunset) no Hub.</p>
+            </div>
         </div>
-    </header>
+    </section>
 
-    <div class="app-wrapper">
-        <nav>
-            <div id="pc-actions-box" style="display: none;">
-                <div class="coin-balance" id="pc-coins" style="justify-content: center; padding: 10px; font-size: 1rem; margin-bottom: 10px;">🪙 0 Coins</div>
-                <select class="lang-select" onchange="changeLang(this.value)" id="lang-sel-pc" style="width: 100%; text-align: center; padding: 10px;">
-                    <option value="pt">Idioma: PT</option><option value="en">Language: EN</option><option value="es">Idioma: ES</option><option value="fr">Langue: FR</option><option value="it">Lingua: IT</option><option value="de">Sprache: DE</option>
-                </select>
-            </div>
-            
-            <div class="nav-item active" onclick="switchView('study', this)">
-                <span class="nav-icon">🧠</span> <span id="nav-study">Treinamento</span>
-            </div>
-            <div class="nav-item" onclick="switchView('decks', this)">
-                <span class="nav-icon">➕</span> <span id="nav-decks">Forjar Cartas</span>
-            </div>
-            <div class="nav-item" onclick="switchView('hub', this)">
-                <span class="nav-icon">💎</span> <span id="nav-market">Hub / Loja</span>
-            </div>
-            <div class="nav-item" onclick="switchView('settings', this)">
-                <span class="nav-icon">⚙️</span> <span id="nav-settings">Sistema</span>
-            </div>
-        </nav>
+    <section class="creator-section reveal">
+        <h2>Plataforma para Criadores</h2>
+        <p>Transforme seu método de ensino em um produto rentável. Crie "Creator Keys" exclusivas e distribua seus Decks estruturados diretamente para os alunos dentro da engine do LangPro.</p>
+        <button id="buy-btn-creator" class="btn btn-secondary" style="display: inline-flex; margin: 0 auto;">Distribuir com Finaltime</button>
+    </section>
 
-        <main>
-            <div class="watermark">FINALTIME STUDIO</div>
-            
-            <div id="view-study" class="view active">
-                <div class="view-content">
-                    <select class="deck-selector" id="active-deck" onchange="changeDeck()"></select>
+    <footer>
+        <p>&copy; 2026 Finaltime Game Studio. Todos os direitos reservados.</p>
+    </footer>
 
-                    <div class="hud" id="main-hud">
-                        <div class="hud-stat" title="Seu Nível"><div class="hud-val" id="hud-level">1</div><div class="hud-label" id="lbl-lvl">Nível</div></div>
-                        <div class="hud-stat" title="Ofensiva Diária"><div class="hud-val streak-fire" id="hud-streak">0🔥</div><div class="hud-label" id="lbl-streak">Dias</div></div>
-                        <div class="hud-stat" title="Cartas na Fila"><div class="hud-val" id="hud-cards">0</div><div class="hud-label" id="lbl-queue">Fila</div></div>
-                    </div>
-
-                    <div class="daily-goal-container">
-                        <div class="daily-goal-header">
-                            <span id="lbl-daily-goal">Meta Diária</span>
-                            <span id="txt-daily-progress">0/20</span>
-                        </div>
-                        <div class="goal-bar-bg">
-                            <div class="goal-bar-fill" id="goal-bar"></div>
-                        </div>
-                    </div>
-
-                    <div style="position: relative;">
-                        <div id="time-bonus-msg" class="time-bonus">⚡ TIME BONUS: 2X XP & COINS!</div>
-                    </div>
-
-                    <div id="no-cards-msg" style="display: none; text-align: center; color: var(--text-muted); margin-top: 40px;">
-                        <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(100%); opacity: 0.2;">🏆</div>
-                        <p id="txt-done" style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;">Sinapses otimizadas.</p>
-                        <p id="txt-done-sub" style="font-size: 0.9rem; margin-top: 10px; color: var(--text-muted);">Volte amanhã ou forje novas conexões.</p>
-                    </div>
-                    
-                    <div id="study-area">
-                        <div class="card-container" onclick="flipCard()">
-                            <div class="card" id="flashcard">
-                                <div class="card-face card-front">
-                                    <img id="front-img" class="card-img" src="">
-                                    <div class="word-main" id="front-word">...</div>
-                                    <div id="txt-tap" style="font-size: 0.75rem; color: var(--primary); margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; opacity: 0.8;">Toque para revelar</div>
-                                </div>
-                                <div class="card-face card-back">
-                                    <div class="word-sub" id="back-target">...</div>
-                                    
-                                    <div class="card-actions">
-                                        <button class="btn-circle btn-audio" onclick="playAudio(event)" title="Ouvir Pronúncia">🔊</button>
-                                        <button class="btn-circle btn-mic" id="btn-voice" onclick="startVoiceTraining(event)" title="Treinar Pronúncia (IA)">🎤</button>
-                                        <button class="btn-circle btn-delete" onclick="deleteCurrentCard(event)" title="Deletar Carta">🗑️</button>
-                                    </div>
-                                    <div id="voice-feedback"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="study-controls" id="controls">
-                            <button class="btn-sm2 again" onclick="processAnswer(0)"><span id="btn-again" style="font-size:1rem;color:white;margin:0;font-weight:800;">Errei</span><span id="time-again">&lt;1m</span></button>
-                            <button class="btn-sm2 hard" onclick="processAnswer(1)"><span id="btn-hard" style="font-size:1rem;color:white;margin:0;font-weight:800;">Difícil</span><span id="time-hard">...</span></button>
-                            <button class="btn-sm2 good" onclick="processAnswer(2)"><span id="btn-good" style="font-size:1rem;color:white;margin:0;font-weight:800;">Bom</span><span id="time-good">...</span></button>
-                            <button class="btn-sm2 easy" onclick="processAnswer(3)"><span id="btn-easy" style="font-size:1rem;color:white;margin:0;font-weight:800;">Fácil</span><span id="time-easy">...</span></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-decks" class="view">
-                <div class="view-content">
-                    <h2 id="title-add" style="margin-bottom: 24px; font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px;">Forjar Conexão Neural</h2>
-                    
-                    <div id="add-card-area">
-                        <label id="lbl-deck">Deck de Destino</label>
-                        <select id="input-deck" class="deck-selector" style="background: rgba(0,0,0,0.3);"></select>
-
-                        <label id="lbl-front">Frente (Língua Base)</label>
-                        <input type="text" id="input-front" placeholder="..." onkeypress="handleEnter(event)">
-                        
-                        <label id="lbl-target">Verso (Idioma Alvo)</label>
-                        <input type="text" id="input-target" placeholder="..." onkeypress="handleEnter(event)">
-
-                        <label id="lbl-img">Memória Visual (Opcional)</label>
-                        <div class="file-upload-wrapper btn" style="margin-bottom: 24px;">
-                            <span id="txt-upload">📁 Escolher Imagem</span>
-                            <input type="file" id="input-img" accept="image/*" onchange="handleImg(event)">
-                        </div>
-                        <img id="img-preview" src="" style="max-width: 100%; height: 140px; object-fit: cover; display: none; margin: 0 auto 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);">
-
-                        <button class="btn btn-primary" id="btn-save-card" onclick="addCard()" style="padding: 18px; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">Salvar no Banco</button>
-                    </div>
-                    
-                    <div id="no-decks-add-msg" style="display: none; text-align: center; margin-top: 60px;">
-                        <p id="txt-no-decks" style="color: var(--text-muted); margin-bottom: 24px; font-size: 1.1rem;">Você precisa criar um Deck primeiro.</p>
-                        <button class="btn btn-primary" onclick="switchView('settings')" id="btn-go-sys">Ir para Sistema</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-hub" class="view">
-                <div class="view-content">
-                    <h2 id="title-market" style="margin-bottom: 24px; font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px;">Hub do Aluno</h2>
-                    
-                    <div class="module-box" style="background: linear-gradient(145deg, rgba(250, 204, 21, 0.05), rgba(139, 92, 246, 0.05)); border-color: rgba(250, 204, 21, 0.2);">
-                        <div class="module-title" id="title-skins"><span>🎨</span> Loja de Temas</div>
-                        <p id="txt-skin-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Use suas Coins adquiridas estudando para customizar sua experiência.</p>
-                        
-                        <div class="theme-grid">
-                            <div class="theme-card" id="theme-default" onclick="buyOrEquipTheme('default')">
-                                <div class="theme-color-preview"><div class="t-c1" style="background: #8b5cf6;"></div><div class="t-c2" style="background: #ec4899;"></div></div>
-                                <div class="theme-name">LangPro Padrão</div>
-                                <div class="theme-price" id="price-default">Equipado</div>
-                            </div>
-                            <div class="theme-card" id="theme-hacker" onclick="buyOrEquipTheme('hacker')">
-                                <div class="theme-color-preview"><div class="t-c1" style="background: #22c55e;"></div><div class="t-c2" style="background: #16a34a;"></div></div>
-                                <div class="theme-name">Hacker Terminal</div>
-                                <div class="theme-price" id="price-hacker">🪙 200</div>
-                            </div>
-                            <div class="theme-card" id="theme-sunset" onclick="buyOrEquipTheme('sunset')">
-                                <div class="theme-color-preview"><div class="t-c1" style="background: #f97316;"></div><div class="t-c2" style="background: #eab308;"></div></div>
-                                <div class="theme-name">Sunset Pink</div>
-                                <div class="theme-price" id="price-sunset">🪙 300</div>
-                            </div>
-                            <div class="theme-card" id="theme-ocean" onclick="buyOrEquipTheme('ocean')">
-                                <div class="theme-color-preview"><div class="t-c1" style="background: #0ea5e9;"></div><div class="t-c2" style="background: #06b6d4;"></div></div>
-                                <div class="theme-name">Deep Ocean</div>
-                                <div class="theme-price" id="price-ocean">🪙 300</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="module-box" style="background: linear-gradient(145deg, rgba(236, 72, 153, 0.05), rgba(139, 92, 246, 0.05)); border-color: rgba(236, 72, 153, 0.2);">
-                        <div class="module-title" id="title-unlock"><span>💎</span> Resgatar Curso Premium</div>
-                        <p id="txt-market-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">Insira a Key do seu criador de conteúdo para baixar o Deck oficial estruturado.</p>
-                        
-                        <label id="lbl-key">Chave de Ativação (Key)</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="input-creator-key" placeholder="EX: PROF-INGLES-2026" onkeyup="this.value = this.value.toUpperCase();" style="margin-bottom: 0; font-family: monospace; letter-spacing: 1px;">
-                            <button class="btn btn-primary" id="btn-unlock" onclick="redeemCreatorKey()" style="width: auto; padding: 0 20px; margin-bottom: 0;">Baixar</button>
-                        </div>
-                    </div>
-
-                    <div class="module-box" style="text-align: center; padding: 32px 20px;">
-                        <p id="txt-creator-ad" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
-                            <strong>É criador de conteúdo?</strong><br>
-                            Monetize seu método com a tecnologia Finaltime Studio.<br>
-                            Crie *Keys* para "Inglês p/ Iniciantes" (R$19), "Francês p/ Imigração" (R$29) ou "Enfermagem Técnica" (R$39).
-                        </p>
-                        <a href="#" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 0.95rem;">Seja um Parceiro B2B &rarr;</a>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-settings" class="view">
-                <div class="view-content">
-                    <h2 id="title-sys" style="margin-bottom: 24px; font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px;">Sistema Geral</h2>
-                    
-                    <div class="module-box">
-                        <div class="module-title" id="title-mng-decks"><span>📚</span> Gestão de Decks</div>
-                        
-                        <label id="lbl-new-deck">Criar Novo Deck</label>
-                        <input type="text" id="new-deck-name" placeholder="...">
-                        
-                        <label id="lbl-tts">Voz Nativa (IA)</label>
-                        <select id="new-deck-lang" class="deck-selector" style="background: rgba(0,0,0,0.3); margin-bottom: 20px;">
-                            <option value="en-US">🇺🇸 Inglês (EUA)</option>
-                            <option value="en-GB">🇬🇧 Inglês (Reino Unido)</option>
-                            <option value="es-ES">🇪🇸 Espanhol</option>
-                            <option value="fr-FR">🇫🇷 Francês</option>
-                            <option value="de-DE">🇩🇪 Alemão</option>
-                            <option value="it-IT">🇮🇹 Italiano</option>
-                            <option value="ja-JP">🇯🇵 Japonês</option>
-                            <option value="pt-BR">🇧🇷 Português</option>
-                        </select>
-                        <button class="btn btn-primary" id="btn-create-deck" onclick="createNewDeck()" style="margin-bottom: 32px;">Criar Deck</button>
-
-                        <div style="height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 24px; width: 100%;"></div>
-
-                        <label id="lbl-del-deck" style="color: var(--danger);">Excluir Deck Existente</label>
-                        <div style="display: flex; gap: 12px;">
-                            <select id="delete-deck-select" class="deck-selector" style="background: rgba(0,0,0,0.3); margin-bottom: 0;"></select>
-                            <button class="btn btn-danger" onclick="deleteSelectedDeck()" style="width: auto; padding: 0 24px; border-radius: 14px;" title="Deletar">🗑️</button>
-                        </div>
-                    </div>
-
-                    <div class="module-box">
-                        <div class="module-title" id="title-db"><span>💾</span> Arquitetura de Dados</div>
-                        <button class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);" id="btn-export" onclick="exportDB()">⬇️ Exportar Backup (.json)</button>
-                        <div class="file-upload-wrapper btn" style="border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
-                            <span id="btn-import">⬆️ Importar Backup (.json)</span>
-                            <input type="file" accept=".json" onchange="importDB(event)">
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 48px; text-align: center;">
-                        <button class="btn btn-danger" id="btn-reset" onclick="hardReset()" style="padding: 18px; font-weight: 800;">⚠️ Formatação de Fábrica</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
+    <script type="text/javascript" src="https://static.itch.io/api.js"></script>
+    
     <script>
-        // --- B2B Creator Keys DB ---
-        const creatorKeysDB = {
-            "FINALTIME-NURSE": {
-                name: "🇺🇸 Inglês P/ Enfermagem (Finaltime)", langCode: "en-US",
-                cards: [ 
-                    { id: 101, front: "Seringa", target: "Syringe", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 },
-                    { id: 102, front: "Pressão Sanguínea", target: "Blood Pressure", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 }
-                ]
-            },
-            "MONTREAL-IMMIG": {
-                name: "🇫🇷 Français (Montreal Survival)", langCode: "fr-CA",
-                cards: [ 
-                    { id: 201, front: "Roupas de frio", target: "Vêtements de grand froid", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 },
-                    { id: 202, front: "Entrevista de emprego", target: "Entretien d'embauche", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 }
-                ]
-            }
+        // 1. Configuração da API do Itch.io (Pop-up de Compra/Download)
+        const itchConfig = {
+            user: "finaltime-game-studio",
+            game: "langpro",
+            width: 800,
+            height: 600
         };
 
-        // --- i18n Dictionary ---
-        const dic = {
-            pt: {
-                navT: "Treinamento", navF: "Forjar Cartas", navM: "Hub / Loja", navS: "Sistema",
-                lvl: "Nível", queue: "Fila", streak: "Dias", done: "Sinapses otimizadas.", doneSub: "Volte amanhã ou forje novas conexões.", tap: "Toque para revelar",
-                again: "Errei", hard: "Difícil", good: "Bom", easy: "Fácil",
-                tAdd: "Forjar Conexão Neural", lDeck: "Deck de Destino", lFront: "Frente (Língua base)", lTarget: "Verso (Idioma Alvo)",
-                lImg: "Memória Visual", tUp: "📁 Escolher Imagem", bSave: "Salvar no Banco", noDecks: "Você precisa criar um Deck primeiro.", bGoSys: "Ir para Sistema",
-                tMarket: "Hub do Aluno", tUnlock: "Resgatar Curso Premium", tMarketDesc: "Insira a Key do seu criador para baixar o Deck oficial.", lKey: "Chave (Key)", bUnlock: "Baixar", tCreatorAd: "Monetize seu método com a Finaltime Studio. Crie Keys e venda seu acesso estruturado (Ex: R$19 a R$39).",
-                tSkins: "Loja de Temas", tSkinDesc: "Use suas Coins para customizar sua experiência.", lDailyGoal: "Meta Diária",
-                tSys: "Sistema Geral", tMngDecks: "Gestão de Decks", lNewDeck: "Novo Deck", lTTS: "Voz Nativa (IA)", bCreateDeck: "Criar Deck", lDelDeck: "Excluir Deck",
-                tDB: "Dados", bExp: "⬇️ Exportar (.json)", bImp: "⬆️ Importar (.json)", bRes: "⚠️ Formatar tudo",
-                obTitle1: "Bem-vindo ao LangPro", obDesc1: "A plataforma definitiva de neuro-aprendizado. Vamos configurar sua conta em 3 passos.", obBtn1: "Começar",
-                obTitle2: "Passo 1: Decks", obDesc2: "Crie seus próprios Decks na aba 'Sistema' ou baixe um pronto usando Keys no 'Hub'.", obBtn2: "Próximo",
-                obTitle3: "Passo 2: Treino IA", obDesc3: "Na hora de estudar, use o botão 🎤 para a IA avaliar sua pronúncia fonética!", obBtn3: "Entendi",
-                voiceOK: "EXCELENTE!", voiceErr: "INCORRETO", voiceMicErr: "Microfone bloqueado/incompatível.",
-                alertSave: "Salvo!", alertImp: "Backup sincronizado!", alertErr: "Erro no JSON.", alertRes: "Apagar TODOS os dados?", alertDel: "Deletado.", alertFill: "Preencha tudo.", alertKeyOk: "Curso baixado!", alertKeyErr: "Chave inválida.", alertCoins: "Coins insuficientes!"
-            },
-            en: {
-                navT: "Training", navF: "Forge Cards", navM: "Hub / Store", navS: "System",
-                lvl: "Level", queue: "Queue", streak: "Days", done: "Synapses optimized.", doneSub: "Return tomorrow or forge new connections.", tap: "Tap to reveal",
-                again: "Again", hard: "Hard", good: "Good", easy: "Easy",
-                tAdd: "Forge Neural Connection", lDeck: "Target Deck", lFront: "Front (Base language)", lTarget: "Back (Target language)",
-                lImg: "Visual Memory", tUp: "📁 Choose Image", bSave: "Save to DB", noDecks: "Create a Deck first.", bGoSys: "Go to System",
-                tMarket: "Student Hub", tUnlock: "Redeem Premium Course", tMarketDesc: "Enter the Key to download the official Deck from your creator.", lKey: "Activation Key", bUnlock: "Download", tCreatorAd: "Monetize your method with Finaltime Studio. Sell structured access via Keys.",
-                tSkins: "Theme Store", tSkinDesc: "Use your Coins to customize your experience.", lDailyGoal: "Daily Goal",
-                tSys: "General System", tMngDecks: "Deck Management", lNewDeck: "New Deck", lTTS: "Native Voice (AI)", bCreateDeck: "Create Deck", lDelDeck: "Delete Deck",
-                tDB: "Data", bExp: "⬇️ Export (.json)", bImp: "⬆️ Import (.json)", bRes: "⚠️ Factory Reset",
-                obTitle1: "Welcome to LangPro", obDesc1: "The ultimate neuro-learning platform. Let's set up your account in 3 steps.", obBtn1: "Start",
-                obTitle2: "Step 1: Decks", obDesc2: "Create your own Decks in 'System' or download one in 'Hub'.", obBtn2: "Next",
-                obTitle3: "Step 2: AI Voice", obDesc3: "While studying, use the 🎤 button for AI phonetic evaluation!", obBtn3: "Got it",
-                voiceOK: "EXCELLENT!", voiceErr: "INCORRECT", voiceMicErr: "Mic blocked/unsupported.",
-                alertSave: "Saved!", alertImp: "Backup synced!", alertErr: "JSON error.", alertRes: "Delete ALL data?", alertDel: "Deleted.", alertFill: "Fill all fields.", alertKeyOk: "Course downloaded!", alertKeyErr: "Invalid key.", alertCoins: "Not enough Coins!"
-            },
-            es: {
-                navT: "Entrenamiento", navF: "Forjar Cartas", navM: "Hub / Tienda", navS: "Sistema",
-                lvl: "Nivel", queue: "Cola", streak: "Días", done: "Sinapsis optimizadas.", doneSub: "Vuelve mañana o forja nuevas conexiones.", tap: "Toca para revelar",
-                again: "Otra vez", hard: "Difícil", good: "Bien", easy: "Fácil",
-                tAdd: "Forjar Conexión", lDeck: "Mazo Destino", lFront: "Frente (Idioma base)", lTarget: "Reverso (Idioma objetivo)",
-                lImg: "Memoria Visual", tUp: "📁 Elegir Imagen", bSave: "Guardar en BD", noDecks: "Crea un mazo primero.", bGoSys: "Ir al Sistema",
-                tMarket: "Hub del Alumno", tUnlock: "Canjear Curso", tMarketDesc: "Ingresa la Clave para descargar el Mazo oficial de tu creador.", lKey: "Clave (Key)", bUnlock: "Descargar", tCreatorAd: "Monetiza tu método con Finaltime Studio.",
-                tSkins: "Tienda de Temas", tSkinDesc: "Usa tus Monedas para personalizar tu experiencia.", lDailyGoal: "Meta Diaria",
-                tSys: "Sistema General", tMngDecks: "Gestión de Mazos", lNewDeck: "Nuevo Mazo", lTTS: "Voz Nativa (IA)", bCreateDeck: "Crear Mazo", lDelDeck: "Eliminar Mazo",
-                tDB: "Datos", bExp: "⬇️ Exportar (.json)", bImp: "⬆️ Importar (.json)", bRes: "⚠️ Restablecer",
-                obTitle1: "Bienvenido a LangPro", obDesc1: "La plataforma de neuroaprendizaje definitiva. 3 pasos rápidos.", obBtn1: "Empezar",
-                obTitle2: "Paso 1: Mazos", obDesc2: "Crea tus mazos o descarga uno en el 'Hub'.", obBtn2: "Siguiente",
-                obTitle3: "Paso 2: IA de Voz", obDesc3: "¡Usa el botón 🎤 para la evaluación fonética de IA!", obBtn3: "Entendido",
-                voiceOK: "¡EXCELENTE!", voiceErr: "INCORRECTO", voiceMicErr: "Micrófono bloqueado.",
-                alertSave: "¡Guardado!", alertImp: "¡Copia sincronizada!", alertErr: "Error en JSON.", alertRes: "¿Borrar TODO?", alertDel: "Eliminado.", alertFill: "Llena todo.", alertKeyOk: "¡Curso descargado!", alertKeyErr: "Clave inválida.", alertCoins: "¡Monedas insuficientes!"
-            },
-            fr: { navT: "Entraînement", navF: "Forger", navM: "Hub", navS: "Système", lvl: "Niv.", queue: "File", streak: "Jours", done: "Synapses optimisées.", doneSub: "Revenez demain.", tap: "Touchez pour révéler", again: "Encore", hard: "Difficile", good: "Bon", easy: "Facile", tAdd: "Forger Connexion", lDeck: "Deck Cible", lFront: "Recto", lTarget: "Verso", lImg: "Mémoire Visuelle", tUp: "📁 Choisir Image", bSave: "Sauvegarder", noDecks: "Créez un Deck d'abord.", bGoSys: "Aller au Système", tMarket: "Hub", tUnlock: "Débloquer", tMarketDesc: "Entrez la Clé.", lKey: "Clé (Key)", bUnlock: "Télécharger", tCreatorAd: "Monétisez avec Finaltime Studio.", tSkins: "Thèmes", tSkinDesc: "Personnalisez votre app.", lDailyGoal: "Objectif du jour", tSys: "Système", tMngDecks: "Gestion", lNewDeck: "Nouveau Deck", lTTS: "Voix Native", bCreateDeck: "Créer Deck", lDelDeck: "Supprimer Deck", tDB: "Données", bExp: "⬇️ Exporter", bImp: "⬆️ Importer", bRes: "⚠️ Réinitialiser", obTitle1: "Bienvenue", obDesc1: "Plateforme de neuro-apprentissage.", obBtn1: "Démarrer", obTitle2: "Étape 1", obDesc2: "Créez ou téléchargez.", obBtn2: "Suivant", obTitle3: "Étape 2", obDesc3: "Utilisez 🎤 pour la prononciation!", obBtn3: "Compris", voiceOK: "EXCELLENT!", voiceErr: "INCORRECT", voiceMicErr: "Mic bloqué.", alertSave: "Sauvegardé!", alertImp: "Synchronisé!", alertErr: "Erreur.", alertRes: "TOUT effacer?", alertDel: "Supprimé.", alertFill: "Remplissez tout.", alertKeyOk: "Téléchargé!", alertKeyErr: "Invalide.", alertCoins: "Pas assez de Coins!" },
-            it: { navT: "Allenamento", navF: "Forgiare", navM: "Hub", navS: "Sistema", lvl: "Liv.", queue: "Coda", streak: "Giorni", done: "Sinapsi ottimizzate.", doneSub: "Torna domani.", tap: "Tocca per rivelare", again: "Ancora", hard: "Difficile", good: "Buono", easy: "Facile", tAdd: "Forga Connessione", lDeck: "Mazzo Target", lFront: "Fronte", lTarget: "Retro", lImg: "Memoria Visiva", tUp: "📁 Scegli", bSave: "Salva", noDecks: "Crea prima un mazzo.", bGoSys: "Vai al Sistema", tMarket: "Hub", tUnlock: "Sblocca", tMarketDesc: "Inserisci chiave.", lKey: "Chiave", bUnlock: "Scarica", tCreatorAd: "Monetizza con Finaltime.", tSkins: "Temi", tSkinDesc: "Personalizza.", lDailyGoal: "Obiettivo Quotidiano", tSys: "Sistema", tMngDecks: "Gestione", lNewDeck: "Nuovo Mazzo", lTTS: "Voce Nativa", bCreateDeck: "Crea Mazzo", lDelDeck: "Elimina Mazzo", tDB: "Dati", bExp: "⬇️ Esporta", bImp: "⬆️ Importa", bRes: "⚠️ Reset", obTitle1: "Benvenuto", obDesc1: "Neuro-apprendimento.", obBtn1: "Inizia", obTitle2: "Passo 1", obDesc2: "Crea o scarica.", obBtn2: "Avanti", obTitle3: "Passo 2", obDesc3: "Usa 🎤 per pronuncia!", obBtn3: "Capito", voiceOK: "ECCELLENTE!", voiceErr: "ERRATO", voiceMicErr: "Mic bloccato.", alertSave: "Salvato!", alertImp: "Sincronizzato!", alertErr: "Errore.", alertRes: "Cancellare TUTTO?", alertDel: "Eliminato.", alertFill: "Compila tutto.", alertKeyOk: "Scaricato!", alertKeyErr: "Non valida.", alertCoins: "Monete insufficienti!" },
-            de: { navT: "Training", navF: "Schmieden", navM: "Hub", navS: "System", lvl: "Lvl", queue: "Schlange", streak: "Tage", done: "Synapsen optimiert.", doneSub: "Komm morgen wieder.", tap: "Zum Aufdecken tippen", again: "Nochmal", hard: "Schwer", good: "Gut", easy: "Einfach", tAdd: "Verbindung schmieden", lDeck: "Ziel-Deck", lFront: "Vorderseite", lTarget: "Rückseite", lImg: "Visuelles Gedächtnis", tUp: "📁 Bild", bSave: "Speichern", noDecks: "Erstelle zuerst ein Deck.", bGoSys: "Zum System", tMarket: "Hub", tUnlock: "Kurs entsperren", tMarketDesc: "Geben Sie den Schlüssel ein.", lKey: "Schlüssel", bUnlock: "Laden", tCreatorAd: "Monetarisieren mit Finaltime.", tSkins: "Themen", tSkinDesc: "Anpassen.", lDailyGoal: "Tagesziel", tSys: "System", tMngDecks: "Verwaltung", lNewDeck: "Neues Deck", lTTS: "KI-Stimme", bCreateDeck: "Deck erstellen", lDelDeck: "Deck löschen", tDB: "Daten", bExp: "⬇️ Exportieren", bImp: "⬆️ Importieren", bRes: "⚠️ Reset", obTitle1: "Willkommen", obDesc1: "Neuro-Lernplattform.", obBtn1: "Start", obTitle2: "Schritt 1", obDesc2: "Erstellen oder laden.", obBtn2: "Weiter", obTitle3: "Schritt 2", obDesc3: "Nutzen Sie 🎤!", obBtn3: "Verstanden", voiceOK: "AUSGEZEICHNET!", voiceErr: "FALSCH", voiceMicErr: "Mikrofon blockiert.", alertSave: "Gespeichert!", alertImp: "Synchronisiert!", alertErr: "Fehler.", alertRes: "ALLES löschen?", alertDel: "Gelöscht.", alertFill: "Alles ausfüllen.", alertKeyOk: "Heruntergeladen!", alertKeyErr: "Ungültig.", alertCoins: "Nicht genug Coins!" }
+        // Atrelando os 3 botões ao mesmo pop-up da loja
+        Itch.attachBuyButton(document.getElementById("buy-btn-android"), itchConfig);
+        Itch.attachBuyButton(document.getElementById("buy-btn-win"), itchConfig);
+        Itch.attachBuyButton(document.getElementById("buy-btn-creator"), itchConfig);
+
+        // 2. Lógica de Scroll Navbar
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        }, { passive: true });
+
+        // 3. Animações de Reveal Altamente Performáticas (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealOptions = {
+            root: null,
+            rootMargin: '0px 0px -100px 0px',
+            threshold: 0.15
         };
 
-        // --- Data Layer Abstraction ---
-        // Pronto para ser trocado para Firebase no futuro
-        const Database = {
-            save: function(data) { localStorage.setItem('langProDB_V7_FINAL', JSON.stringify(data)); },
-            load: function() { return JSON.parse(localStorage.getItem('langProDB_V7_FINAL')); }
-        };
-
-        const defaultState = {
-            user: { 
-                xp: 0, level: 1, streak: 0, lastActiveDate: null, isFirstTime: true,
-                coins: 0, dailyProgress: 0, dailyGoal: 20, activeTheme: 'default', unlockedThemes: ['default']
-            },
-            decks: {
-                deck_demo: { name: "Meu Primeiro Deck (Espanhol)", langCode: "es-ES", cards: [
-                    { id: 1, front: "Bom dia", target: "Buenos días", img: "", interval: 0, reps: 0, ease: 2.5, nextReview: 0 }
-                ]}
-            }
-        };
-
-        // Load and Merge state safely
-        let appData = Database.load();
-        if(!appData) appData = JSON.parse(JSON.stringify(defaultState));
-        // Safe Merge for older versions that might not have new variables
-        if(appData.user.coins === undefined) appData.user.coins = 0;
-        if(appData.user.dailyProgress === undefined) appData.user.dailyProgress = 0;
-        if(appData.user.dailyGoal === undefined) appData.user.dailyGoal = 20;
-        if(appData.user.activeTheme === undefined) appData.user.activeTheme = 'default';
-        if(appData.user.unlockedThemes === undefined) appData.user.unlockedThemes = ['default'];
-
-        let currentDeckId = null, queue = [], currentCard = null, isFlipped = false, cardStartTime = 0;
-        let tempB64 = "";
-
-        // --- Theming Engine ---
-        const sysThemes = {
-            default: { bg: '#09090b', surf: '#18181b', surfHover: '#27272a', prim: '#8b5cf6', primGlow: 'rgba(139, 92, 246, 0.4)', sec: '#ec4899', acc: '#06b6d4', textMain: '#f4f4f5' },
-            hacker: { bg: '#0a0a0a', surf: '#111111', surfHover: '#1a1a1a', prim: '#22c55e', primGlow: 'rgba(34, 197, 94, 0.4)', sec: '#16a34a', acc: '#4ade80', textMain: '#e5e5e5' },
-            sunset: { bg: '#2e0219', surf: '#4a0429', surfHover: '#6b053b', prim: '#f97316', primGlow: 'rgba(249, 115, 22, 0.4)', sec: '#eab308', acc: '#f43f5e', textMain: '#ffffff' },
-            ocean: { bg: '#020617', surf: '#0f172a', surfHover: '#1e293b', prim: '#0ea5e9', primGlow: 'rgba(14, 165, 233, 0.4)', sec: '#06b6d4', acc: '#38bdf8', textMain: '#f8fafc' }
-        };
-        const themePrices = { hacker: 200, sunset: 300, ocean: 300 };
-
-        function applyTheme(tName) {
-            const t = sysThemes[tName] || sysThemes['default'];
-            const r = document.documentElement;
-            r.style.setProperty('--bg-deep', t.bg); r.style.setProperty('--surface', t.surf); r.style.setProperty('--surface-hover', t.surfHover);
-            r.style.setProperty('--primary', t.prim); r.style.setProperty('--primary-glow', t.primGlow); r.style.setProperty('--secondary', t.sec);
-            r.style.setProperty('--accent', t.acc); r.style.setProperty('--text-main', t.textMain);
-        }
-        applyTheme(appData.user.activeTheme);
-
-        function updateStoreUI() {
-            ['default', 'hacker', 'sunset', 'ocean'].forEach(t => {
-                const card = document.getElementById(`theme-${t}`);
-                const priceLabel = document.getElementById(`price-${t}`);
-                card.classList.remove('active');
-                if(appData.user.activeTheme === t) {
-                    card.classList.add('active'); priceLabel.innerText = "Equipado";
-                } else if(appData.user.unlockedThemes.includes(t)) {
-                    priceLabel.innerText = "Desbloqueado";
-                } else {
-                    priceLabel.innerText = `🪙 ${themePrices[t]}`;
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Para a animação rodar só na primeira vez
                 }
             });
-        }
+        }, revealOptions);
 
-        function buyOrEquipTheme(t) {
-            if(appData.user.unlockedThemes.includes(t)) {
-                appData.user.activeTheme = t; applyTheme(t); updateStoreUI(); Database.save(appData);
-            } else {
-                if(appData.user.coins >= themePrices[t]) {
-                    appData.user.coins -= themePrices[t];
-                    appData.user.unlockedThemes.push(t);
-                    appData.user.activeTheme = t;
-                    applyTheme(t); updateStoreUI(); updateHUD(); Database.save(appData);
-                    shootConfetti();
-                } else {
-                    alert(dic[currentLang].alertCoins);
-                }
-            }
-        }
-
-
-        // --- Core Gamification & HUD ---
-        function checkDailyLogic() {
-            const today = new Date().toDateString();
-            if(appData.user.lastActiveDate !== today) {
-                if(appData.user.lastActiveDate) {
-                    const lastDate = new Date(appData.user.lastActiveDate);
-                    const diffDays = Math.ceil(Math.abs(new Date() - lastDate) / (1000 * 60 * 60 * 24)); 
-                    if(diffDays === 1) appData.user.streak++;
-                    else if(diffDays > 1) appData.user.streak = 1; 
-                } else { appData.user.streak = 1; }
-                
-                appData.user.dailyProgress = 0; // Reseta a meta pro novo dia
-                appData.user.lastActiveDate = today;
-                Database.save(appData);
-            }
-        }
-
-        let currentLang = 'pt';
-        function changeLang(lang) {
-            currentLang = lang; const d = dic[lang];
-            document.getElementById('lang-sel-mob').value = lang; document.getElementById('lang-sel-pc').value = lang;
-            
-            document.getElementById('nav-study').innerText = d.navT; document.getElementById('nav-decks').innerText = d.navF; document.getElementById('nav-market').innerText = d.navM; document.getElementById('nav-settings').innerText = d.navS;
-            document.getElementById('lbl-lvl').innerText = d.lvl; document.getElementById('lbl-queue').innerText = d.queue; document.getElementById('lbl-streak').innerText = d.streak;
-            document.getElementById('txt-done').innerText = d.done; document.getElementById('txt-done-sub').innerText = d.doneSub; document.getElementById('txt-tap').innerText = d.tap;
-            document.getElementById('btn-again').innerText = d.again; document.getElementById('btn-hard').innerText = d.hard; document.getElementById('btn-good').innerText = d.good; document.getElementById('btn-easy').innerText = d.easy;
-            document.getElementById('title-add').innerText = d.tAdd; document.getElementById('lbl-deck').innerText = d.lDeck; document.getElementById('lbl-front').innerText = d.lFront; document.getElementById('lbl-target').innerText = d.lTarget;
-            document.getElementById('lbl-img').innerText = d.lImg; if(!tempB64) document.getElementById('txt-upload').innerText = d.tUp; document.getElementById('btn-save-card').innerText = d.bSave;
-            document.getElementById('txt-no-decks').innerText = d.noDecks; document.getElementById('btn-go-sys').innerText = d.bGoSys;
-            
-            document.getElementById('title-market').innerText = d.tMarket; document.getElementById('title-unlock').innerHTML = `<span>💎</span> ${d.tUnlock}`; document.getElementById('txt-market-desc').innerText = d.tMarketDesc;
-            document.getElementById('lbl-key').innerText = d.lKey; document.getElementById('btn-unlock').innerText = d.bUnlock; document.getElementById('txt-creator-ad').innerHTML = `<strong>É criador de conteúdo?</strong><br>Monetize seu método com a Finaltime Studio.<br>Crie Keys e venda seu acesso estruturado (Ex: R$19 a R$39).`;
-            document.getElementById('title-skins').innerHTML = `<span>🎨</span> ${d.tSkins}`; document.getElementById('txt-skin-desc').innerText = d.tSkinDesc;
-            document.getElementById('lbl-daily-goal').innerText = d.lDailyGoal;
-
-            document.getElementById('title-sys').innerText = d.tSys; document.getElementById('title-mng-decks').innerHTML = `<span>📚</span> ${d.tMngDecks}`; document.getElementById('lbl-new-deck').innerText = d.lNewDeck;
-            document.getElementById('lbl-tts').innerText = d.lTTS; document.getElementById('btn-create-deck').innerText = d.bCreateDeck; document.getElementById('lbl-del-deck').innerText = d.lDelDeck;
-            document.getElementById('title-db').innerHTML = `<span>💾</span> ${d.tDB}`; document.getElementById('btn-export').innerText = d.bExp; document.getElementById('btn-import').innerText = d.bImp; document.getElementById('btn-reset').innerText = d.bRes;
-        }
-
-        function addCoins(amount, elementToBump = null) {
-            appData.user.coins += amount;
-            updateHUD();
-            if(elementToBump) {
-                elementToBump.classList.add('bump');
-                setTimeout(()=> elementToBump.classList.remove('bump'), 300);
-            }
-        }
-
-        function updateHUD() {
-            document.getElementById('hud-level').innerText = appData.user.level;
-            document.getElementById('hud-cards').innerText = queue.length;
-            document.getElementById('hud-streak').innerText = `${appData.user.streak}🔥`;
-            if(appData.user.streak === 0) document.getElementById('hud-streak').classList.remove('streak-fire');
-            else document.getElementById('hud-streak').classList.add('streak-fire');
-            
-            const coinsTxt = `🪙 ${appData.user.coins}`;
-            document.getElementById('mob-coins').innerText = coinsTxt;
-            document.getElementById('pc-coins').innerText = coinsTxt;
-
-            // Daily Goal
-            document.getElementById('txt-daily-progress').innerText = `${appData.user.dailyProgress}/${appData.user.dailyGoal}`;
-            const percent = Math.min((appData.user.dailyProgress / appData.user.dailyGoal) * 100, 100);
-            document.getElementById('goal-bar').style.width = `${percent}%`;
-        }
-
-        function shootConfetti() {
-            const container = document.getElementById('confetti-container');
-            container.innerHTML = '';
-            for(let i=0; i<40; i++) {
-                const conf = document.createElement('div');
-                conf.className = 'confetti';
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 60%)`;
-                conf.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-                conf.style.animationDelay = (Math.random() * 0.2) + 's';
-                container.appendChild(conf);
-            }
-            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            setTimeout(()=> { container.innerHTML = ''; }, 3000);
-        }
-
-        // --- Onboarding Logic ---
-        let obStep = 1;
-        function checkOnboarding() {
-            if(appData.user.isFirstTime) {
-                document.getElementById('onboarding-modal').classList.add('active');
-            }
-        }
-        function nextOnboarding() {
-            obStep++;
-            const d = dic[currentLang];
-            if(obStep === 2) {
-                document.getElementById('ob-icon').innerText = "📚";
-                document.getElementById('ob-title').innerText = d.obTitle2;
-                document.getElementById('ob-desc').innerText = d.obDesc2;
-                document.getElementById('ob-btn').innerText = d.obBtn2;
-                document.getElementById('dot-1').classList.remove('active'); document.getElementById('dot-2').classList.add('active');
-            } else if(obStep === 3) {
-                document.getElementById('ob-icon').innerText = "🎤";
-                document.getElementById('ob-title').innerText = d.obTitle3;
-                document.getElementById('ob-desc').innerText = d.obDesc3;
-                document.getElementById('ob-btn').innerText = d.obBtn3;
-                document.getElementById('dot-2').classList.remove('active'); document.getElementById('dot-3').classList.add('active');
-            } else {
-                document.getElementById('onboarding-modal').classList.remove('active');
-                appData.user.isFirstTime = false; Database.save(appData);
-            }
-        }
-
-        function switchView(viewId, navEl) {
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(navEl) navEl.classList.add('active');
-            else document.getElementById(`nav-${viewId}`).classList.add('active');
-            if(viewId === 'study') initStudy();
-            if(viewId === 'hub') updateStoreUI();
-        }
-
-        // --- Algoritmo de Similaridade (Levenshtein) para IA de Voz ---
-        function getLevenshteinDistance(a, b) {
-            const matrix = [];
-            for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-            for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-            for (let i = 1; i <= b.length; i++) {
-                for (let j = 1; j <= a.length; j++) {
-                    if (b.charAt(i-1) == a.charAt(j-1)) { matrix[i][j] = matrix[i-1][j-1]; } 
-                    else { matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); }
-                }
-            }
-            return matrix[b.length][a.length];
-        }
-        function getSimilarityPercent(a, b) {
-            let longer = a.length > b.length ? a : b;
-            let shorter = a.length > b.length ? b : a;
-            if(longer.length === 0) return 100;
-            return ((longer.length - getLevenshteinDistance(longer, shorter)) / parseFloat(longer.length)) * 100;
-        }
-
-        // --- WOW Feature: Web Speech API (Voice Recognition) ---
-        let recognition = null;
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-        }
-
-        function startVoiceTraining(event) {
-            event.stopPropagation();
-            if(!recognition) { alert(dic[currentLang].voiceMicErr); return; }
-            
-            const btn = document.getElementById('btn-voice');
-            const feedback = document.getElementById('voice-feedback');
-            
-            recognition.lang = appData.decks[currentDeckId].langCode;
-            btn.classList.add('listening');
-            feedback.innerText = "..."; feedback.style.color = "var(--text-muted)";
-
-            recognition.start();
-
-            recognition.onresult = (e) => {
-                const transcript = e.results[0][0].transcript.toLowerCase().trim();
-                const target = currentCard.target.toLowerCase().trim();
-                btn.classList.remove('listening');
-                
-                // Limpa pontuação simples para comparar
-                const cleanT = transcript.replace(/[.,!?¿¡]/g, '');
-                const cleanC = target.replace(/[.,!?¿¡]/g, '');
-                
-                const sim = getSimilarityPercent(cleanT, cleanC);
-
-                if(sim >= 80 || cleanC.includes(cleanT)) {
-                    feedback.innerText = `${dic[currentLang].voiceOK} (${Math.round(sim)}%)`;
-                    feedback.style.color = "var(--success)";
-                    appData.user.xp += 10; addCoins(2, document.getElementById('mob-coins'));
-                    shootConfetti();
-                } else {
-                    feedback.innerText = `"${transcript}" (${Math.round(sim)}%) - ${dic[currentLang].voiceErr}`;
-                    feedback.style.color = "var(--danger)";
-                    if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                }
-            };
-            
-            recognition.onerror = () => { btn.classList.remove('listening'); feedback.innerText = dic[currentLang].voiceMicErr; feedback.style.color = "var(--danger)"; };
-            recognition.onend = () => { btn.classList.remove('listening'); };
-        }
-
-        // --- Study Core & SM-2 Alg ---
-        function changeDeck() { currentDeckId = document.getElementById('active-deck').value; initStudy(); }
-
-        function initStudy() {
-            const area = document.getElementById('study-area'), msg = document.getElementById('no-cards-msg');
-            checkDailyLogic();
-            if(!currentDeckId || !appData.decks[currentDeckId]) {
-                area.style.display = 'none'; msg.style.display = 'none'; updateHUD(); return; 
-            }
-            const now = Date.now();
-            queue = appData.decks[currentDeckId].cards.filter(c => c.nextReview <= now).sort(() => Math.random() - 0.5);
-            updateHUD(); renderCard();
-        }
-
-        function renderCard() {
-            const area = document.getElementById('study-area'), msg = document.getElementById('no-cards-msg');
-            const cardEl = document.getElementById('flashcard'), controls = document.getElementById('controls');
-            document.getElementById('voice-feedback').innerText = ""; 
-
-            if (queue.length === 0) { area.style.display = 'none'; msg.style.display = 'block'; return; }
-            area.style.display = 'block'; msg.style.display = 'none';
-            
-            currentCard = queue[0]; isFlipped = false; cardStartTime = Date.now();
-            cardEl.classList.remove('flipped'); controls.classList.remove('visible');
-
-            setTimeout(() => {
-                const imgEl = document.getElementById('front-img');
-                if(currentCard.img) { imgEl.src = currentCard.img; imgEl.style.display = 'block'; } 
-                else { imgEl.style.display = 'none'; }
-                
-                document.getElementById('front-word').innerText = currentCard.front;
-                document.getElementById('back-target').innerText = currentCard.target;
-                
-                // Previsão SM-2 para os botões
-                const fmt = (d) => d < 1 ? "< 1d" : `${Math.round(d)}d`;
-                const cInterval = currentCard.interval === 0 ? 1 : currentCard.interval;
-                document.getElementById('time-again').innerText = "< 1m";
-                document.getElementById('time-hard').innerText = fmt(cInterval * 1.2);
-                document.getElementById('time-good').innerText = fmt(currentCard.reps === 0 ? 1 : (currentCard.reps === 1 ? 6 : cInterval * currentCard.ease));
-                document.getElementById('time-easy').innerText = fmt(currentCard.reps === 0 ? 4 : cInterval * currentCard.ease * 1.3);
-            }, 250);
-        }
-
-        function flipCard() {
-            if (queue.length === 0 || isFlipped) return;
-            isFlipped = true;
-            if(navigator.vibrate) navigator.vibrate(20); // Tactile feel
-            document.getElementById('flashcard').classList.add('flipped');
-            document.getElementById('controls').classList.add('visible');
-            triggerTTS(currentCard.target);
-        }
-
-        function triggerTTS(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = appData.decks[currentDeckId].langCode; u.rate = 0.9;
-                window.speechSynthesis.speak(u);
-            }
-        }
-        function playAudio(e) { e.stopPropagation(); triggerTTS(currentCard.target); }
-
-        function processAnswer(quality) {
-            event.stopPropagation();
-            const timeTaken = (Date.now() - cardStartTime) / 1000;
-            const isFast = quality > 0 && timeTaken < 3.0;
-
-            let card = queue.shift();
-            // SM-2 Real Alg Logic
-            if (quality === 0) { // Again
-                card.reps = 0; card.interval = 1; card.ease = Math.max(1.3, card.ease - 0.2);
-                queue.push(card); 
-            } else {
-                if (quality === 1) { card.interval = card.interval === 0 ? 1 : card.interval * 1.2; card.ease = Math.max(1.3, card.ease - 0.15); } // Hard
-                else if (quality === 2) { card.interval = card.reps === 0 ? 1 : (card.reps === 1 ? 6 : card.interval * card.ease); } // Good
-                else if (quality === 3) { card.interval = card.reps === 0 ? 4 : card.interval * card.ease * 1.3; card.ease += 0.15; } // Easy
-                
-                card.reps++;
-                
-                // Daily Goal Progress
-                if(appData.user.dailyProgress < appData.user.dailyGoal) {
-                    appData.user.dailyProgress++;
-                    addCoins(1); // Ganha 1 coin normal
-                    if(appData.user.dailyProgress === appData.user.dailyGoal) {
-                        addCoins(50, document.getElementById('mob-coins')); // Bonus
-                        shootConfetti();
-                    }
-                }
-
-                if(isFast) {
-                    const msg = document.getElementById('time-bonus-msg');
-                    const hud = document.getElementById('main-hud');
-                    msg.classList.add('active'); hud.classList.add('pulse');
-                    addCoins(1); // XP/Coin extra por rapidez
-                    setTimeout(() => { msg.classList.remove('active'); hud.classList.remove('pulse'); }, 1200);
-                }
-                appData.user.xp += (isFast ? quality * 20 : quality * 10);
-                if(appData.user.xp >= appData.user.level * 200) { appData.user.level++; appData.user.xp = 0; shootConfetti(); }
-            }
-            if (quality !== 0) card.nextReview = Date.now() + (card.interval * 86400000);
-            
-            const arr = appData.decks[currentDeckId].cards;
-            const idx = arr.findIndex(c => c.id === card.id);
-            if(idx !== -1) arr[idx] = card;
-            
-            Database.save(appData); 
-            updateHUD(); 
-            renderCard();
-        }
-
-        // --- Deck Selectors & Add Card ---
-        function updateDeckSelectors() {
-            const keys = Object.keys(appData.decks);
-            const activeSel = document.getElementById('active-deck');
-            const addSel = document.getElementById('input-deck');
-            const delSel = document.getElementById('delete-deck-select');
-            
-            activeSel.innerHTML = ''; addSel.innerHTML = ''; delSel.innerHTML = '';
-
-            if(keys.length === 0) {
-                activeSel.style.display = 'none'; document.getElementById('add-card-area').style.display = 'none';
-                document.getElementById('no-decks-add-msg').style.display = 'block'; currentDeckId = null; return;
-            }
-            activeSel.style.display = 'block'; document.getElementById('add-card-area').style.display = 'block';
-            document.getElementById('no-decks-add-msg').style.display = 'none';
-
-            keys.forEach(k => {
-                const opt = `<option value="${k}">${appData.decks[k].name}</option>`;
-                activeSel.innerHTML += opt; addSel.innerHTML += opt; delSel.innerHTML += opt;
-            });
-            if(!currentDeckId || !appData.decks[currentDeckId]) currentDeckId = keys[0];
-            activeSel.value = currentDeckId;
-        }
-
-        function createNewDeck() {
-            const name = document.getElementById('new-deck-name').value.trim();
-            const langCode = document.getElementById('new-deck-lang').value;
-            if(!name) return alert(dic[currentLang].alertFill);
-            const newId = 'deck_' + Date.now();
-            appData.decks[newId] = { name, langCode, cards: [] };
-            Database.save(appData); document.getElementById('new-deck-name').value = ''; updateDeckSelectors();
-            currentDeckId = newId; document.getElementById('active-deck').value = newId;
-        }
-
-        function deleteSelectedDeck() {
-            const targetId = document.getElementById('delete-deck-select').value;
-            if(!targetId) return;
-            if(confirm(dic[currentLang].alertRes)) { delete appData.decks[targetId]; Database.save(appData); updateDeckSelectors(); initStudy(); }
-        }
-
-        function deleteCurrentCard(event) {
-            event.stopPropagation();
-            if(confirm(dic[currentLang].alertDel)) {
-                appData.decks[currentDeckId].cards = appData.decks[currentDeckId].cards.filter(c => c.id !== currentCard.id);
-                Database.save(appData); initStudy();
-            }
-        }
-
-        function handleEnter(e) { if(e.key === 'Enter') { e.preventDefault(); addCard(); } }
-        function handleImg(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    tempB64 = evt.target.result; document.getElementById('img-preview').src = tempB64; 
-                    document.getElementById('img-preview').style.display = 'block'; document.getElementById('txt-upload').innerText = "✅";
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function addCard() {
-            const tDeck = document.getElementById('input-deck').value;
-            const front = document.getElementById('input-front').value.trim();
-            const target = document.getElementById('input-target').value.trim();
-            if(!tDeck || !front || !target) return alert(dic[currentLang].alertFill);
-
-            appData.decks[tDeck].cards.push({ id: Date.now(), front, target, img: tempB64, interval: 0, reps: 0, ease: 2.5, nextReview: 0 });
-            Database.save(appData); document.getElementById('input-front').value = ''; document.getElementById('input-target').value = '';
-            document.getElementById('img-preview').style.display = 'none'; tempB64 = ""; document.getElementById('txt-upload').innerText = dic[currentLang].tUp;
-            
-            const btn = document.getElementById('btn-save-card'); const orig = btn.innerText;
-            btn.innerText = "✅ " + dic[currentLang].alertSave; btn.style.background = "var(--success)";
-            setTimeout(() => { btn.innerText = orig; btn.style.background = ""; }, 1500);
-            if(tDeck === currentDeckId) initStudy();
-        }
-
-        function redeemCreatorKey() {
-            const key = document.getElementById('input-creator-key').value.trim().toUpperCase();
-            if(creatorKeysDB[key]) {
-                const newId = 'course_' + key + '_' + Date.now();
-                appData.decks[newId] = JSON.parse(JSON.stringify(creatorKeysDB[key]));
-                Database.save(appData); document.getElementById('input-creator-key').value = ''; updateDeckSelectors();
-                currentDeckId = newId; document.getElementById('active-deck').value = newId;
-                alert(dic[currentLang].alertKeyOk); shootConfetti(); switchView('study');
-            } else alert(dic[currentLang].alertKeyErr);
-        }
-
-        function exportDB() {
-            const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const dl = document.createElement('a'); dl.href = str; dl.download = "LangPro_V7_Backup.json";
-            document.body.appendChild(dl); dl.click(); dl.remove();
-        }
-        function importDB(e) {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    const imp = JSON.parse(evt.target.result);
-                    if(imp && imp.decks) { appData = imp; Database.save(appData); alert(dic[currentLang].alertImp); location.reload(); } 
-                    else throw new Error();
-                } catch(err) { alert(dic[currentLang].alertErr); }
-            }; reader.readAsText(file);
-        }
-        function hardReset() { if(confirm(dic[currentLang].alertRes)) { localStorage.removeItem('langProDB_V7_FINAL'); location.reload(); } }
-
-        // Boot
-        updateDeckSelectors();
-        changeLang('pt');
-        initStudy();
-        setTimeout(checkOnboarding, 500);
+        revealElements.forEach(el => revealObserver.observe(el));
     </script>
 </body>
 </html>
